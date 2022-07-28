@@ -121,13 +121,18 @@ void print_todos(buffer_t* todos)
 {
 
     // TODO: nice colors
+    // TODO: nice alignment
     printf("Your todos:\n");
 
     todo_t* iter = buffer_begin(todos);
     todo_t* end = buffer_end(todos);
     uint64_t pos = 0;
     for (pos = 0; iter != end; iter++, pos++) {
-        printf("\t[%lu] %s: %s\n", pos, iter->head, iter->desc);
+        printf("\t[%lu] %s", pos, iter->head);
+        if (*iter->desc != '\0') {
+            printf(": %s", iter->desc);
+        }
+        putc('\n', stdout);
     }
 
     if (pos == 0) {
