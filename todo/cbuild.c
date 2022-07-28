@@ -31,6 +31,9 @@ int main(int argc, char** argv)
         compile_all(FAST_FLAGS);
     } else if (strcmp(argv[1], "clean") == 0) {
         clean();
+    } else if (strcmp(argv[1], "install") == 0) {
+        printf("cp out ~/bin/todo\n");
+        system("cp out ~/bin/todo");
     } else {
         fprintf(stderr, "\033[31mError: \033[39m unknown option: %s\n", argv[1]);
     }
