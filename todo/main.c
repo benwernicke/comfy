@@ -11,8 +11,7 @@
 
 typedef struct todo_t todo_t;
 struct todo_t {
-    char desc[128];
-    char head[32];
+    char body[64];
 };
 
 #define TODO_FILE_PATH "/home/ben/.config/todo/todo"
@@ -34,7 +33,7 @@ void read_todos(buffer_t* todos)
 
     // remove last added thing
     {
-        uint64_t pos = ((uint8_t*)buffer_end(todos) - (uint8_t*)buffer_begin(todos)) - 1;
+        uint64_t pos = ((todo_t*)buffer_end(todos) - (todo_t*)buffer_begin(todos)) - 1;
         buffer_remove(todos, pos);
     }
 
@@ -68,23 +67,10 @@ bool is_uint(char* s)
 
 void remove_todo(buffer_t* todos, char* arg)
 {
-    uint64_t pos;
-    if (is_uint(arg)) {
-        pos = atol(arg);
-        if (pos >= buffer_size(todos)) {
-            panic("unknown todo id: %lu", pos);
-        }
-
-    } else {
-        todo_t* iter = (todo_t*)buffer_begin(todos);
-        todo_t* end = (todo_t*)buffer_end(todos);
-        for (; iter != end; iter++) {
-            if (strcmp(iter->head, arg) == 0) {
-                pos = iter - (todo_t*)buffer_begin(todos);
-                break;
-            }
-        }
-        panic_if(iter == end, "unknown todo: %s", arg);
+    panic_if(!is_uint(arg), "argument of remove must be a number");
+    uint64_t pos = atol(arg);
+    if (pos >= buffer_size(todos)) {
+        panic("unknown todo id: %lu", pos);
     }
     buffer_remove(todos, pos);
 }
@@ -100,19 +86,8 @@ void add_todo(buffer_t* todos, char** argv)
     // header
     {
         uint64_t len = strlen(*argv);
-        panic_if(len >= sizeof(t->head), "head: '%s' is too long", *argv);
-        memcpy(t->head, *argv, len);
-        argv++;
-    }
-
-    // desc
-    {
-        if (*argv == NULL) {
-            return;
-        }
-        uint64_t len = strlen(*argv);
-        panic_if(len >= sizeof(t->desc), "description: '%s' is too long", *argv);
-        memcpy(t->desc, *argv, len);
+        panic_if(len >= sizeof(t->body), "head: '%s' is too long", *argv);
+        memcpy(t->body, *argv, len);
         argv++;
     }
 }
@@ -128,11 +103,7 @@ void print_todos(buffer_t* todos)
     todo_t* end = buffer_end(todos);
     uint64_t pos = 0;
     for (pos = 0; iter != end; iter++, pos++) {
-        printf("\t[%lu] %s", pos, iter->head);
-        if (*iter->desc != '\0') {
-            printf(": %s", iter->desc);
-        }
-        putc('\n', stdout);
+        printf("\t[%lu] %s\n", pos, iter->body);
     }
 
     if (pos == 0) {
