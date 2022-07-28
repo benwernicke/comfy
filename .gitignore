@@ -1,3 +1,7 @@
 todo/cbuild
 todo/build/*
 todo/out
+
+fixme/cbuild
+fixme/build/*
+fixme/out
