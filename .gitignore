@@ -2,6 +2,14 @@ todo/cbuild
 todo/build/*
 todo/out
 
-fixme/cbuild
-fixme/build/*
-fixme/out
+clock/cbuild
+clock/build/*
+clock/out
+
+battery/cbuild
+battery/build/*
+battery/out
+
+sgen/cbuild
+sgen/build/*
+sgen/out
