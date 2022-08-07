@@ -29,7 +29,10 @@ int main(int argc, char** argv)
         compile_all(FAST_FLAGS);
     } else if(strcmp(argv[1], "clean") == 0) {
         clean();
-    } else {
+    } else if(strcmp(argv[1], "install") == 0) {
+        printf("cp out /usr/bin/clock\n");
+        system("cp out /usr/bin/clock");
+    }else {
         fprintf(stderr, "\033[31mError: \033[39m unknown option: %s\n", argv[1]);
     }
     return 0;
