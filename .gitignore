@@ -1,15 +1,15 @@
-todo/cbuild
+todo/beaver
 todo/build/*
 todo/out
 
-clock/cbuild
+clock/beaver
 clock/build/*
 clock/out
 
-battery/cbuild
+battery/beaver
 battery/build/*
 battery/out
 
-sgen/cbuild
+sgen/beaver
 sgen/build/*
 sgen/out
