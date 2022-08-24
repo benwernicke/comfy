@@ -1,91 +1,60 @@
-#include <ctype.h>
-#include <errno.h>
 #include <stdint.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
-#define PATH "/proc/meminfo"
-
-#define ERROR_IF(b, ...)                                                       \
-    {                                                                          \
-        if (b) {                                                               \
-            fprintf(stderr, "error: ");                                        \
-            fprintf(stderr, __VA_ARGS__);                                      \
-            fprintf(stderr, "\n");                                             \
-            exit(1);                                                           \
-        }                                                                      \
-    }
 
 int main(void)
 {
-    uint64_t total = 0;
-    uint64_t avail = 0;
-    uint64_t freem = 0;
+    char cmd[] = "free --mebi";
+    FILE* meminfo = popen(cmd, "r");
 
-    FILE* fh = fopen(PATH, "r");
-    ERROR_IF(fh == NULL, "could not open file: %s: %s", PATH, strerror(errno));
-    char* line = NULL;
     uint64_t size = 0;
-    int64_t len = 0;
+    char* line = NULL;
 
-    // total
+    getline(&line, &size, meminfo);
+    getline(&line, &size, meminfo);
+
+    uint64_t total = 0;
+    uint64_t used = 0;
+    // parsing
     {
-        len = getline(&line, &size, fh);
-        ERROR_IF(0 >= len, "could not read line: %s", strerror(errno));
-        char* s = strchr(line, ':');
-        s++;
-        while (isspace(*s)) {
+        char* s = line;     
+        char* start;
+        while(isspace(*s)) {
             s++;
         }
-        char* e = s;
-        while (*e && !isspace(*e)) {
-            e++;
-        }
-        *e = 0;
-        total = atol(s);
-    }
-    // free skipping
-    {
-        len = getline(&line, &size, fh);
-        ERROR_IF(0 >= len, "could not read line: %s", strerror(errno));
-        char* s = strchr(line, ':');
-        s++;
-        while (isspace(*s)) {
+        while(*s && !isspace(*s)) {
             s++;
         }
-        char* e = s;
-        while (*e && !isspace(*e)) {
-            e++;
-        }
-        *e = 0;
-        freem = atol(s);
-    }
-    // available
-    {
-        len = getline(&line, &size, fh);
-        ERROR_IF(0 >= len, "could not read line: %s", strerror(errno));
-        char* s = strchr(line, ':');
-        s++;
-        while (isspace(*s)) {
+        while(isspace(*s)) {
             s++;
         }
-        char* e = s;
-        while (*e && !isspace(*e)) {
-            e++;
+        // s is on total
+        start = s;
+        while(*s && !isspace(*s)) {
+            s++;
         }
-        *e = 0;
-        avail = atol(s);
+        *s = 0;
+        total = atol(start);
+        s++;
+
+        // s is on used
+        while(isspace(*s)) {
+            s++;
+        }
+        start = s;
+        while(*s && !isspace(*s)) {
+            s++;
+        }
+        *s = 0;
+        used = atol(start);
+        s++;
     }
 
+    printf("%luM / %luM\n", used, total);
+
+    // here could be swap space usage be implemented
     free(line);
-    fclose(fh);
-
-    avail /= 1024;
-    total /= 1024;
-    freem /= 1024;
-
-    printf("%lu, %lu / %lu\n", total - freem, total - avail, total);
-
+    pclose(meminfo);
     return 0;
 }

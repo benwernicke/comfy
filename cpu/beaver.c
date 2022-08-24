@@ -1,6 +1,8 @@
 #include "lib/beaver.h"
 
-#define FLAGS "-g -Wall -Werror -Og"
+#define FLAGS "-pipe -g -Wall -Werror -Og"
+#define FAST_FLAGS "-pipe -O2 -march=native"
+
 
 module_t modules[] = {
     { .name = "main", .src = "main.c" },
@@ -18,7 +20,9 @@ int main(int argc, char** argv)
         rm("build/*");
         rm("out");
     } else if(strcmp(argv[1], "install") == 0) {
-        call_or_panic("cp out /usr/bin/memory");
+        call_or_panic("cp out /usr/bin/cpu");
+    } else if(strcmp(argv[1], "fast") == 0) {
+        compile(program, FAST_FLAGS);
     }
     return 0;
 }

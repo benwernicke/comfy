@@ -10,6 +10,10 @@ battery/beaver
 battery/build/*
 battery/out
 
+cpu/beaver
+cpu/build/*
+cpu/out
+
 sgen/beaver
 sgen/build/*
 sgen/out
